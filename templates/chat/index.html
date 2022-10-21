@@ -20,6 +20,7 @@
 
     {% else %}
         <h1>Group Name: {{group_name}}</h1> <br><br><br>
+        {{ group_name|json_script:'user-group-name' }}
 
         <textarea name="display_messages" id="display_messages" cols="30" rows="10"></textarea><br>
         <input type="text" name="text_message" id="text_message" required><br>
@@ -27,7 +28,35 @@
 
 
         <script>
-            
+            const groupName = JSON.parse(document.getElementById('user-group-name').innerText);
+            const ws = new WebSocket(  // for Synchronous Connection
+                'ws://'
+                + window.location.host
+                + '/ws/chat/jsc/'
+                + groupName
+                + '/'
+            );
+            // const ws = new WebSocket(  // for Asynchronous Connection
+            //     'ws://'
+            //     + window.location.host
+            //     + '/ws/chat/ajsc/'
+            //     + groupName
+            //     + '/'
+            // );
+
+            ws.onopen = function (event) {
+                console.log('Connection Established.', event);
+            };
+
+            ws.onmessage = function (event) {
+                console.log('Message Received.', event.data);
+            };
+
+            ws.close = function (event) {
+                console.log('Connection Closed.', event);
+            };
+
+
         </script>
     {% endif %}
 

@@ -15,7 +15,6 @@ class ChatView(View):
 
     def get(self, request):
         group_name = request.GET.get('group-name')
-        print(group_name)
         context = {'group_name': group_name}
 
         return render(request, self.template_name, context)
