@@ -27,17 +27,33 @@ class MyJsonWebsocketConsumer(JsonWebsocketConsumer):
 
     def receive_json(self, content, **kwargs):
         print('---------------Receive Dta---------------', content)
+        
+        if self.scope['user'].is_authenticated == True:
+            print('Authorized User----------------: ', self.scope['user'])
 
-        Chat.objects.create(group=self.group_obj, text=content['messages']) # save the client messages
+            Chat.objects.create(group=self.group_obj, text=content['messages']) # save the client messages
+            content['username'] = self.scope['user'].username
+        else:
+            print('Unauthorized User----------------: ', self.scope['user'])
+            
+            content = {
+                'messages': 'Login Required. Before sending any message you must be login.',
+                'username': 'Unauthorized User'
+            }
+
+        self.messageDealaverytoGroup(content)
+    
+
+    def messageDealaverytoGroup(self, content):     # custom function
 
         async_to_sync(self.channel_layer.group_send)(
             self.group_name,
             {
-                'type': 'send.messages',
+                'type': 'send.messages',  # here "send.messages" is a custom event.
                 'text': content
             }
         )
-    
+
 
     def send_messages(self, event): # custom event handler, event is "send.messages"
         self.send_json(event['text'])
@@ -65,13 +81,30 @@ class MyAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content, **kwargs):
         print('---------------Receive Data---------------', content)
 
-        # save the client messages
-        await database_sync_to_async(Chat.objects.create)(group=self.group_obj, text=content['messages'])
+        if self.scope['user'].is_authenticated == True:
+            print('Authorized User----------------: ', self.scope['user'])
+
+            # save the client messages
+            await database_sync_to_async(Chat.objects.create)(group=self.group_obj, text=content['messages'])
+            content['username'] = self.scope['user'].username
+        
+        else:
+            print('Unauthorized User----------------: ', self.scope['user'])
+            
+            content = {
+                'messages': 'Login Required. Before sending any message you must be login.',
+                'username': 'Unauthorized User'
+            }
+
+        await self.messageDealaverytoGroup(content)
+
+
+    async def messageDealaverytoGroup(self, content):     # custom function
 
         await self.channel_layer.group_send(
             self.group_name,
             {
-                'type': 'send.messages',
+                'type': 'send.messages',  # here "send.messages" is a custom event.
                 'text': content
             }
         )
