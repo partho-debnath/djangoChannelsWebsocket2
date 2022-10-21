@@ -22,7 +22,11 @@
         <h1>Group Name: {{group_name}}</h1> <br><br><br>
         {{ group_name|json_script:'user-group-name' }}
 
-        <textarea name="display_messages" id="display_messages" cols="30" rows="10"></textarea><br>
+        <textarea name="display_messages" id="display_messages" cols="30" rows="10">
+            {% for old_message in old_messages %}
+                {{ old_message.text }}
+            {% endfor %}
+        </textarea><br>
         <input type="text" name="text_message" id="text_message" required><br>
         <button type="submit" id="message-submit" placeholder="Write You Messages....">Send</button>
 

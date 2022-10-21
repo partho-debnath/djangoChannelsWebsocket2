@@ -1,7 +1,9 @@
 from channels.generic.websocket import JsonWebsocketConsumer, AsyncJsonWebsocketConsumer
+from channels.db import database_sync_to_async
 
 from asgiref.sync import async_to_sync
 
+from .models import Group, Chat
 
 class MyJsonWebsocketConsumer(JsonWebsocketConsumer):
 
@@ -43,7 +45,9 @@ class MyAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
         print(self.channel_layer)
         print(self.channel_name)
         print(self.scope)
+
         self.group_name =  self.scope['url_route']['kwargs']['groupName']
+        self.group_obj = await database_sync_to_async(Group.objects.get)(name=self.group_name) # get the client group name object
 
         await self.channel_layer.group_add(
             self.group_name,
@@ -54,6 +58,9 @@ class MyAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content, **kwargs):
         print('---------------Receive Data---------------', content)
+
+        # save the client messages
+        await database_sync_to_async(Chat.objects.create)(group=self.group_obj, text=content['messages'])
 
         await self.channel_layer.group_send(
             self.group_name,
