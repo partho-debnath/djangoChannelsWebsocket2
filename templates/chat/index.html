@@ -29,20 +29,21 @@
 
         <script>
             const groupName = JSON.parse(document.getElementById('user-group-name').innerText);
-            const ws = new WebSocket(  // for Synchronous Connection
-                'ws://'
-                + window.location.host
-                + '/ws/chat/jsc/'
-                + groupName
-                + '/'
-            );
-            // const ws = new WebSocket(  // for Asynchronous Connection
+            // const ws = new WebSocket(  // for Synchronous Connection
             //     'ws://'
             //     + window.location.host
-            //     + '/ws/chat/ajsc/'
+            //     + '/ws/chat/scj/'
             //     + groupName
             //     + '/'
             // );
+
+            const ws = new WebSocket(  // for Asynchronous Connection
+                'ws://'
+                + window.location.host
+                + '/ws/chat/acj/'
+                + groupName
+                + '/'
+            );
 
             ws.onopen = function (event) {
                 console.log('Connection Established.', event);
@@ -50,12 +51,18 @@
 
             ws.onmessage = function (event) {
                 console.log('Message Received.', event.data);
+                var message_obj = JSON.parse(event.data);
+                document.querySelector('#display_messages').textContent += message_obj.messages + '\n';
             };
 
             ws.close = function (event) {
                 console.log('Connection Closed.', event);
             };
 
+            document.getElementById('message-submit').onclick = function (event){
+                var user_messages = document.getElementById('text_message').value;
+                ws.send(JSON.stringify({'messages': user_messages}))
+            };
 
         </script>
     {% endif %}
