@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django Realtime Chat Application.</title>
+</head>
+<body>
+
+    <h2>Django Channels and WebSocket Generic views JsonwebsocketConsumer, AsyncJsonwebsocketConsumer</h2><hr><hr>
+
+
+    {% if group_name is None %}
+    
+        <form action="{% url 'chat-view' %}" method="get">
+            <input type="text" name="group-name" maxlength="20" minlength="5" placeholder="Group Name" required><br>
+            <button type="submit">Connect To this Group</button>
+        </form>
+
+    {% else %}
+        <h1>Group Name: {{group_name}}</h1> <br><br><br>
+
+        <textarea name="display_messages" id="display_messages" cols="30" rows="10"></textarea><br>
+        <input type="text" name="text_message" id="text_message" required><br>
+        <button type="submit" id="message-submit" placeholder="Write You Messages....">Send</button>
+
+
+        <script>
+            
+        </script>
+    {% endif %}
+
+    
+</body>
+</html>
